@@ -39,6 +39,6 @@ else:
 
 if __name__ == "__main__":
     pprint(stockData)
-    # plt.figure(figsize = (18,12))
-    # plt.boxplot(stockData[["open","high","low","price"]].transpose())
-    # plt.show()
+    plt.figure(figsize = (18,12))
+    plt.boxplot(stockData["GOOGL"][["open","high","low","close"]].transpose())
+    plt.show()
