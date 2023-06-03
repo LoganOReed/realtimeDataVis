@@ -5,6 +5,8 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from alpha_vantage.async_support.timeseries import TimeSeries
 
+apiCall = False
+
 # ts = TimeSeries(key="R0AU0EWLEJEKDL6W", output_format="pandas")
 symbols = [
     "GOOGL",
@@ -20,18 +22,19 @@ async def getData(symbol):
     await ts.close()
     return data
 
+if apiCall:
+    loop = asyncio.get_event_loop()
+    tasks = [getData(symbol) for symbol in symbols]
+    group1 = asyncio.gather(*tasks)
+    results = loop.run_until_complete(group1)
+    loop.close()
 
-loop = asyncio.get_event_loop()
-tasks = [getData(symbol) for symbol in symbols]
-group1 = asyncio.gather(*tasks)
-results = loop.run_until_complete(group1)
-loop.close()
+    stockData = pd.DataFrame(results)
+    stockData.columns = stockData.columns.str[3:]
+    stockData.to_csv("temp.csv", index=False)
+else:
+    stockData = pd.read_csv("temp.csv")
 
-stockData = pd.DataFrame(results)
-stockData.columns = stockData.columns.str[3:]
-
-# save to temp csv so I don't have to call the api as much
-stockData.to_csv(index=False)
 
 
 if __name__ == "__main__":
