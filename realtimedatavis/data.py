@@ -3,6 +3,7 @@ from pprint import pprint
 import numpy as np 
 import pandas as pd
 import matplotlib.pyplot as plt
+import seaborn as sns
 from alpha_vantage.async_support.timeseries import TimeSeries
 
 apiCall = True
@@ -18,7 +19,7 @@ symbols = [
 
 async def getData(symbol):
     ts = TimeSeries(key="R0AU0EWLEJEKDL6W", output_format="pandas")
-    data, _ = await ts.get_intraday(symbol,interval="1min",outputsize="full")
+    data, _ = await ts.get_intraday(symbol,interval="1min")
     await ts.close()
     return data
 
@@ -34,11 +35,16 @@ if apiCall:
         stockData[sym].columns = stockData[sym].columns.str[3:]
         stockData[sym].to_csv(sym+"_temp.csv", index=False)
 else:
-    stockData = pd.read_csv("temp.csv")
+    stockData ={"GOOGL": pd.read_csv("GOOGL_temp.csv")} 
 
 
 if __name__ == "__main__":
     pprint(stockData)
-    plt.figure(figsize = (18,12))
-    plt.boxplot(stockData["GOOGL"][["open","high","low","close"]].transpose())
-    plt.show()
+    # plt.figure(figsize = (18,12))
+    # plt.boxplot(stockData["GOOGL"][["open","high","low","close"]].transpose())
+    # plt.show()
+    sns.set_theme()
+    sns.relplot(
+        data=stockData["GOOGL"],
+        x="high", y="low", col="volume",
+    )
