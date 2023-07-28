@@ -18,7 +18,8 @@ symbols = [
 ]
 
 async def getData(symbol):
-    ts = TimeSeries(key="R0AU0EWLEJEKDL6W", output_format="pandas")
+    # ts = TimeSeries(key="R0AU0EWLEJEKDL6W", output_format="pandas")
+    ts = TimeSeries(key="G1ODTS0PTE9Q0JJC", output_format="pandas")
     data, _ = await ts.get_intraday(symbol,interval="1min")
     await ts.close()
     return data
@@ -33,7 +34,9 @@ if apiCall:
 
     for sym in symbols:
         stockData[sym].columns = stockData[sym].columns.str[3:]
-        stockData[sym].to_csv(sym+"_temp.csv", index=False)
+        stockData[sym]["time"] = stockData[sym].index.to_list()
+        stockData[sym].to_csv(sym+"_temp.csv", index=True)
+
 else:
     stockData ={"GOOGL": pd.read_csv("GOOGL_temp.csv")} 
 
@@ -44,7 +47,14 @@ if __name__ == "__main__":
     # plt.boxplot(stockData["GOOGL"][["open","high","low","close"]].transpose())
     # plt.show()
     sns.set_theme()
-    sns.relplot(
-        data=stockData["GOOGL"],
-        x="high", y="low", col="volume",
-    )
+    sns.catplot(data=stockData["GOOGL"],
+                x="time",
+                y=["open","high","low","close"],
+                # y="open",
+                hue="volume",
+                kind="box")
+    # sns.relplot(
+    #     data=stockData["GOOGL"],
+    #     x="date", y="open", col="close",
+    # )
+    plt.show()
